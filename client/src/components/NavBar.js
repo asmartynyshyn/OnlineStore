@@ -21,14 +21,19 @@ const NavBar = observer(() => {
         <Navbar bg="dark" variant="dark">
             <Container>
                 <NavLink style={{color:'white'}} to={SHOP_ROUTE}>Online Store "Devices"</NavLink>
-                {user.isAuth ?
+                {user.isAuth && user.user !== true ?
                     <Nav className="ml-auto" style={{color: 'white'}}>
-                        <Button
-                            variant={"outline-light"}
-                            onClick={() => history.push(ADMIN_ROUTE)}
-                        >
-                            Admin
-                        </Button>
+                        <div style={{padding: "5px 25px 0 0", fontSize: "20px"}}>{user.user}</div>
+                        
+                        {user.role === "ADMIN" &&
+                            <Button
+                                variant={"outline-light"}
+                                onClick={() => history.push(ADMIN_ROUTE)}
+                            >
+                                Admin
+                            </Button>
+                        }
+
                         <Button
                             variant={"outline-light"}
                             onClick={() => logOut()}

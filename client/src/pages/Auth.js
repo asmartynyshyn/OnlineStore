@@ -16,22 +16,24 @@ const Auth = observer(() => {
     const isLogin = location.pathname === LOGIN_ROUTE
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [first_name, setFirst_name] = useState('')
+    const [last_name, setLast_name] = useState('')
 
     const click = async () => {
+        let data;
         try {
-            let data;
             if (isLogin) {
                 data = await login(email, password);
             } else {
-                data = await registration(email, password);
+                data = await registration(first_name, last_name, email, password);
             }
-            user.setUser(user)
+            user.setUser(data.first_name + " " + data.last_name)
             user.setIsAuth(true)
+            user.setRole(data.role)
             history.push(SHOP_ROUTE)
         } catch (e) {
             alert(e.response.data.message)
         }
-
     }
 
     return (
@@ -42,6 +44,25 @@ const Auth = observer(() => {
             <Card style={{width: 600}} className="p-5">
                 <h2 className="m-auto">{isLogin ? 'Authorization' : "Registration"}</h2>
                 <Form className="d-flex flex-column">
+                    {isLogin 
+                        ? ""
+                        : <>
+                            <Form.Control
+                                className="mt-3"
+                                placeholder="Enter your first name..."
+                                value={first_name}
+                                onChange={e => setFirst_name(e.target.value)}
+                            />
+
+                            <Form.Control
+                                className="mt-3"
+                                placeholder="Enter your last name..."
+                                value={last_name}
+                                onChange={e => setLast_name(e.target.value)}
+                            />
+                        </>
+                    } 
+                     
                     <Form.Control
                         className="mt-3"
                         placeholder="Enter your email..."
@@ -55,6 +76,7 @@ const Auth = observer(() => {
                         onChange={e => setPassword(e.target.value)}
                         type="password"
                     />
+
                     <Row className="d-flex justify-content-between mt-3 pl-3 pr-3">
                         {isLogin ?
                             <div>
