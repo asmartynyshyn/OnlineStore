@@ -23,13 +23,13 @@ const NavBar = observer(() => {
         <Navbar bg="dark" variant="dark">
             <Container>
                 <NavLink style={{color:'white'}} to={SHOP_ROUTE}>Online Store "Devices"</NavLink>
-                {user.isAuth && user.user !== true ?
-                    <Nav className="ml-auto" style={{color: 'white'}}>
+                {user.isAuth && user.user !== true
+                    ? <Nav className="ms-auto" style={{color: 'white'}}>
                         <div style={{padding: "5px 25px 0 0", fontSize: "20px"}}>{user.user}</div>
                         
                         <Button 
                             variant={"outline-light"}
-                            className="mr-2"
+                            className="me-2"
                             onClick = {()=> history.push(BASKET_ROUTE)}
                         >
                             <FiShoppingCart />
@@ -38,7 +38,7 @@ const NavBar = observer(() => {
                         {user.role === "ADMIN" &&
                             <Button
                                 variant={"outline-light"}
-                                className="mr-2"
+                                className="me-2"
                                 onClick={() => history.push(ADMIN_ROUTE)}
                             >
                                 Admin
@@ -53,7 +53,7 @@ const NavBar = observer(() => {
                         </Button>
                     </Nav>
                     :
-                    <Nav className="ml-auto" style={{color: 'white'}}>
+                    <Nav className="ms-auto" style={{color: 'white'}}>
                         <Button variant={"outline-light"} onClick={() => history.push(LOGIN_ROUTE)}>Authorization</Button>
                     </Nav>
                 }

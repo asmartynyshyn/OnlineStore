@@ -30,12 +30,13 @@ const Auth = observer(() => {
             user.setUser(data.first_name + " " + data.last_name)
             user.setIsAuth(true)
             user.setRole(data.role)
+            user.setUserId(data.id)
             history.push(SHOP_ROUTE)
         } catch (e) {
             alert(e.response.data.message)
         }
     }
-
+    // console.log(user.userId);
     return (
         <Container
             className="d-flex justify-content-center align-items-center"

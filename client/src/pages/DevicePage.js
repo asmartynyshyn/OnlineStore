@@ -1,15 +1,27 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {Button, Card, Col, Container, Image, Row} from "react-bootstrap";
-import bigStar from '../assets/bigStar.png'
-import {useParams} from 'react-router-dom'
+import {BASKET_ROUTE} from "../utils/consts";
+import bigStar from '../assets/bigStar.png';
+import {useParams} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 import {fetchOneDevice} from "../http/deviceAPI";
+import { createBasket } from '../http/basketAPI';
+import {Context} from "../index";
 
 const DevicePage = () => {
+    const {user} = useContext(Context)
+    const history = useHistory()
     const [device, setDevice] = useState({info: []})
     const {id} = useParams()
+
     useEffect(() => {
         fetchOneDevice(id).then(data => setDevice(data))
     }, [id])
+
+    const clickAddDevice = () => {
+        createBasket(user.userId, id);
+        history.push(BASKET_ROUTE);
+    }
 
     return (
         <Container className="mt-3">
@@ -34,7 +46,12 @@ const DevicePage = () => {
                         style={{width: 300, height: 300, fontSize: 32, border: '5px solid lightgray'}}
                     >
                         <h3>from: ${device.price}</h3>
-                        <Button variant={"outline-dark"}>Add to Basket</Button>
+                        <Button 
+                            variant={"outline-dark"}
+                            onClick = {clickAddDevice}
+                        >
+                            Add to Basket
+                        </Button>
                     </Card>
                 </Col>
             </Row>
