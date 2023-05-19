@@ -5,21 +5,32 @@ import bigStar from '../assets/bigStar.png';
 import {useParams} from 'react-router-dom';
 import {useHistory} from 'react-router-dom';
 import {fetchOneDevice} from "../http/deviceAPI";
-import { createBasket } from '../http/basketAPI';
+import { createBasket, getAll } from '../http/basketAPI';
 import {Context} from "../index";
 
 const DevicePage = () => {
     const {user} = useContext(Context)
     const history = useHistory()
     const [device, setDevice] = useState({info: []})
+    const [itemsInBasket, setItemsInBasket] = useState([])
     const {id} = useParams()
 
     useEffect(() => {
         fetchOneDevice(id).then(data => setDevice(data))
-    }, [id])
+    }, [id]);
+
+    useEffect(() => {
+        getAll().then(data => setItemsInBasket(data));
+    }, [itemsInBasket]);
 
     const clickAddDevice = () => {
-        createBasket(user.userId, id);
+        var maxId = itemsInBasket.reduce((a,b) => {
+            return new Date(a.createdAt) > new Date(b.createdAt) ? a : b
+        },{});
+
+        if (Object.keys(maxId).length === 0) {maxId.id = 0}
+
+        createBasket(maxId.id + 1, user.userId, id);
         history.push(BASKET_ROUTE);
     }
 
