@@ -1,11 +1,12 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {Button, Card, Col, Container, Image, Row} from "react-bootstrap";
-import {BASKET_ROUTE} from "../utils/consts";
+import {SHOP_ROUTE, BASKET_ROUTE} from "../utils/consts";
 import bigStar from '../assets/bigStar.png';
 import {useParams} from 'react-router-dom';
 import {useHistory} from 'react-router-dom';
 import {fetchOneDevice} from "../http/deviceAPI";
 import { createBasket, getAll } from '../http/basketAPI';
+import {FaStar} from 'react-icons/fa';
 import {Context} from "../index";
 
 const DevicePage = () => {
@@ -13,6 +14,8 @@ const DevicePage = () => {
     const history = useHistory()
     const [device, setDevice] = useState({info: []})
     const [itemsInBasket, setItemsInBasket] = useState([])
+    const [rating, setRating] = useState(null)
+    const [hover, setHover] = useState(null)
     const {id} = useParams()
 
     useEffect(() => {
@@ -24,14 +27,18 @@ const DevicePage = () => {
     }, [itemsInBasket]);
 
     const clickAddDevice = () => {
-        var maxId = itemsInBasket.reduce((a,b) => {
-            return new Date(a.createdAt) > new Date(b.createdAt) ? a : b
-        },{});
+        if (user.userId === 0) {
+            history.push(SHOP_ROUTE);
+        } else {
+            var maxId = itemsInBasket.reduce((a,b) => {
+                return new Date(a.createdAt) > new Date(b.createdAt) ? a : b
+            },{});
 
-        if (Object.keys(maxId).length === 0) {maxId.id = 0}
+            if (Object.keys(maxId).length === 0) {maxId.id = 0}
 
-        createBasket(maxId.id + 1, user.userId, id);
-        history.push(BASKET_ROUTE);
+            createBasket(maxId.id + 1, user.userId, id);
+            history.push(BASKET_ROUTE);
+        }
     }
 
     return (
@@ -57,6 +64,34 @@ const DevicePage = () => {
                         style={{width: 300, height: 300, fontSize: 32, border: '5px solid lightgray'}}
                     >
                         <h3>from: ${device.price}</h3>
+
+                        <div>
+                            {[...Array(5)].map((star, index) => {
+                                const currentRating = index + 1
+                                return (
+                                    <label key={index}>
+                                        <input
+                                            style={{display: 'none'}}
+                                            type='radio'
+                                            name='rating'
+                                            value={currentRating}
+                                            onClick={() => {
+                                                setRating(currentRating);
+                                                
+                                            }}
+                                        />
+                                        <FaStar
+                                            style={{cursor: 'pointer'}}
+                                            size={40}
+                                            color={currentRating <= (hover || rating) ? "#ffc107" : "e4e5e9"}
+                                            onMouseEnter={() => setHover(currentRating)}
+                                            onMouseLeave={() => setHover(null)}
+                                        />
+                                    </label>
+                                ) 
+                            })}
+                        </div>        
+                        
                         <Button 
                             variant={"outline-dark"}
                             onClick = {clickAddDevice}

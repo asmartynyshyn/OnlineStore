@@ -19,7 +19,7 @@ const Basket = () => {
     useEffect(() => {
         if (clickRemoveButton) {deleteRow(itemInBasket)}
         setClickRemoveButton(false)
-    },[clickRemoveButton]);
+    },[clickRemoveButton, itemInBasket]);
 
     const styledTotals = {
         display: "flex",
@@ -53,18 +53,6 @@ const Basket = () => {
                                         size='sm'
                                         variant='danger'
                                         onClick={() => {
-                                            // console.log(childRow.basketId)
-                                            // console.log(childRow.id)
-                                            // console.log(childRow)
-                                            // delete itemsInBasket.childRow.id
-                                            // console.log(childRow.unique_number)
-                                            // setNumberOfRow(childRow.unique_number)
-                                            // console.log(numberOfRow)
-                                            // setItemInBasket({
-                                            //     id: childRow.unique_number
-                                            // })
-                                            // console.log(itemInBasket.id)
-                                            // deleteRow(childRow.unique_number)
                                             setItemInBasket({unique_number: childRow.unique_number});
                                             setClickRemoveButton(true);
                                         }}
