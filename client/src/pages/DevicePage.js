@@ -4,9 +4,9 @@ import {SHOP_ROUTE, BASKET_ROUTE} from "../utils/consts";
 import bigStar from '../assets/bigStar.png';
 import {useParams} from 'react-router-dom';
 import {useHistory} from 'react-router-dom';
-import {fetchOneDevice} from "../http/deviceAPI";
+import {fetchOneDevice, updateRating} from "../http/deviceAPI";
 import {createBasket, getAll} from '../http/basketAPI';
-import {updateRating, fetchRates, createRate} from '../http/ratingAPI';
+import {updateRate, fetchRates, createRate} from '../http/ratingAPI';
 import {FaStar} from 'react-icons/fa';
 import {Context} from "../index";
 
@@ -18,8 +18,11 @@ const DevicePage = () => {
     const [rates, setRates] = useState([])
     const [rate, setRate] = useState([{rate: 0}]);
     const [rating, setRating] = useState(0)
+    const [averageRate, setAverageRate] = useState(0)
     const [hover, setHover] = useState(null)
     const [clickStar, setClickStar] = useState(false)
+    const [totalRate, setTotalRate] = useState([])
+    const [counter, setCounter] = useState(1);
     const {id} = useParams()
 
     useEffect(() => {
@@ -38,7 +41,7 @@ const DevicePage = () => {
 
     useEffect(() => {
         if (clickStar && user.userId !== 0) {
-            updateRating(rating, user.userId, device.id)
+            updateRate(rating, user.userId, device.id)
             setClickStar(false)
         }
 
@@ -48,11 +51,29 @@ const DevicePage = () => {
             createRate(rating, user.userId, device.id)
             setClickStar(false)
         }
-    },[clickStar, rating, user.userId, device.id, rates, rate.length,]);
+    },[clickStar, rating, user.userId, device.id, rates, rate.length]);
 
     useEffect(() => {
         fetchRates().then(data => setRates(data));
     }, [rates]);
+
+    useEffect(() => {
+        let totalRates = rates.filter((rate) => {return rate.deviceId === device.id})
+        let total = 0
+        for (let i = 0; i < totalRates.length; i++) {
+            total += totalRates[i].rate
+        }
+        setTotalRate(total)
+
+        if (!isNaN((totalRate/totalRates.length).toFixed(0))) {
+            setCounter((totalRate/totalRates.length).toFixed(0));
+        } else {setCounter(1)}
+
+        if (device.id !== undefined && !isNaN((totalRate/totalRates.length).toFixed(0))) {
+            updateRating(device.id, counter)
+            setAverageRate(counter)
+        }
+    }, [rates, device.id, totalRate, counter, device.rating]);
 
     const clickAddDevice = () => {
         if (user.userId === 0) {
@@ -82,7 +103,7 @@ const DevicePage = () => {
                             className="d-flex align-items-center justify-content-center"
                             style={{background: `url(${bigStar}) no-repeat center center`, width:240, height: 240, backgroundSize: 'cover', fontSize:64}}
                         >
-                            {device.rating}
+                            {averageRate}
                         </div>
                     </Row>
                 </Col>
