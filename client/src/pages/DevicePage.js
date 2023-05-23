@@ -5,7 +5,8 @@ import bigStar from '../assets/bigStar.png';
 import {useParams} from 'react-router-dom';
 import {useHistory} from 'react-router-dom';
 import {fetchOneDevice} from "../http/deviceAPI";
-import { createBasket, getAll } from '../http/basketAPI';
+import {createBasket, getAll} from '../http/basketAPI';
+import {updateRating, fetchRates, createRate} from '../http/ratingAPI';
 import {FaStar} from 'react-icons/fa';
 import {Context} from "../index";
 
@@ -14,8 +15,11 @@ const DevicePage = () => {
     const history = useHistory()
     const [device, setDevice] = useState({info: []})
     const [itemsInBasket, setItemsInBasket] = useState([])
-    const [rating, setRating] = useState(null)
+    const [rates, setRates] = useState([])
+    const [rate, setRate] = useState([{rate: 0}]);
+    const [rating, setRating] = useState(0)
     const [hover, setHover] = useState(null)
+    const [clickStar, setClickStar] = useState(false)
     const {id} = useParams()
 
     useEffect(() => {
@@ -25,6 +29,30 @@ const DevicePage = () => {
     useEffect(() => {
         getAll().then(data => setItemsInBasket(data));
     }, [itemsInBasket]);
+
+    useEffect(() => {
+        if (rate.length !== 0 && user.userId !== 0) {
+            setRating(rate[0].rate)
+        }
+    }, [rate, user.userId]);
+
+    useEffect(() => {
+        if (clickStar && user.userId !== 0) {
+            updateRating(rating, user.userId, device.id)
+            setClickStar(false)
+        }
+
+        setRate(rates.filter((rate) => {return user.userId === rate.userId && device.id === rate.deviceId}));
+        
+        if (rate.length === 0 && clickStar) {
+            createRate(rating, user.userId, device.id)
+            setClickStar(false)
+        }
+    },[clickStar, rating, user.userId, device.id, rates, rate.length,]);
+
+    useEffect(() => {
+        fetchRates().then(data => setRates(data));
+    }, [rates]);
 
     const clickAddDevice = () => {
         if (user.userId === 0) {
@@ -76,15 +104,17 @@ const DevicePage = () => {
                                             name='rating'
                                             value={currentRating}
                                             onClick={() => {
-                                                setRating(currentRating);
-                                                
+                                                if (user.userId !== 0) {
+                                                    setClickStar(true)
+                                                    setRating(currentRating)
+                                                }
                                             }}
                                         />
                                         <FaStar
                                             style={{cursor: 'pointer'}}
                                             size={40}
                                             color={currentRating <= (hover || rating) ? "#ffc107" : "e4e5e9"}
-                                            onMouseEnter={() => setHover(currentRating)}
+                                            onMouseEnter={() => setHover(user.userId !==0 ? currentRating : null)}
                                             onMouseLeave={() => setHover(null)}
                                         />
                                     </label>
